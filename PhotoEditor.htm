@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Photo Editor</title>
+    <link rel="stylesheet" href="w3.css">
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css'
+        integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+    <style>
+        * {
+            font-family: 'bahnschrift light';
+        }
+
+        .name {
+            letter-spacing: 3px;
+            font-weight: bold;
+            font-size: 28px;
+        }
+
+        label {
+            font-size: 18px;
+        }
+
+        #image {
+            width: 100%;
+
+        }
+
+        #option-bar {
+            height: 550px;
+            overflow-y: scroll;
+        }
+
+        .option {
+            font-size: 22px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .change-img {
+            font-size: 20px;
+        }
+
+        #myCanvas {
+            width: 100%;
+            height:460px;
+            background: black;
+            position: relative;
+        }
+
+        #window {
+            position: absolute;
+            width: 70%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        #image-container {
+            width: 100%;
+        }
+
+        #preview {
+            width: 100%;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="w3-bar w3-red w3-center w3-card-4 w3-margin-bottom">
+        <div class="w3-padding name">
+            PhotoEditor &nbsp;<i class="fas fa-magic"></i>
+        </div>
+    </div>
+
+    <div class="w3-row-padding w3-margin-bottom">
+
+        <div class="w3-col l4 m4 w3-margin-top w3-card">
+
+            <div class="w3-bar w3-red w3-margin-top w3-center w3-border-white w3-bottombar w3-padding option">
+                Filters &nbsp;&nbsp;<i class="fas fa-sliders-h"></i>
+            </div>
+
+            <div class="w3-padding w3-margin-bottom" id="option-bar">
+
+                <div>
+                    <label>Brightness</label>
+                    <input class="w3-input" id="bright" type="range" min="0" max="500" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Contrast</label>
+                    <input class="w3-input" id="contrast" type="range" value="10" min="0" max="50" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Saturation</label>
+                    <input class="w3-input" id="saturation" type="range" value="1" min="0" max="100"
+                        onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Hue</label>
+                    <input class="w3-input" id="hue" type="range" value="0" min="0" max="180" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Sepia</label>
+                    <input class="w3-input" id="sepia" type="range" value="0" min="0" max="100" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Grayscale</label>
+                    <input class="w3-input" id="gray" type="range" value="0" min="0" max="100" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Invert</label>
+                    <input class="w3-input" id="invert" type="range" value="0" min="0" max="100" onchange="filter()">
+                </div>
+
+                <div>
+                    <label>Blur</label>
+                    <input class="w3-input" id="opac" type="range" value="0" min="0" max="20" onchange="filter()">
+                </div>
+            </div>
+        </div>
+
+        <div class="w3-col l8 m8 w3-margin-top">
+            <div class="w3-card w3-padding">
+                <img src="img/one.jpg" id="image" style="display:none; ">
+                <canvas id="myCanvas">
+                    Your browser does not support Canvas.
+                </canvas>
+            </div>
+        </div>
+
+        <div class="w3-col l8 m8 w3-margin-top w3-margin-bottom">
+            <div class="w3-bar w3-red w3-center w3-padding change-img">
+                Change image &nbsp;&nbsp;<i class="fas fa-trash"></i>
+            </div>
+            <div class="w3-bar w3-card w3-padding w3-padding-24">
+                <input type="file" id="file" class="w3-bar-item">
+                <button class="w3-bar-item w3-red" onclick="upl()">Upload &nbsp;&nbsp;<i class="fas fa-upload"></i>
+                    <button class="w3-bar-item w3-right w3-red" onclick="show()">Download
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="window" class="w3-card-4 w3-white w3-display-container">
+        <div class="w3-bar w3-red w3-card">
+            <div class="w3-bar-item w3-padding w3-large">Download preview</div>
+            <div class="w3-button w3-right w3-hover-red w3-large" onclick="hide()">&times;</div>
+        </div>
+        <div id="image-container">
+            <img src="" id="preview">
+        </div>
+        <a href="" id="downBtn" download>
+        <div class="w3-button w3-red w3-display-bottommiddle w3-margin">Download &nbsp;&nbsp;<i class="fas fa-download"></i></div>
+        </a>
+    </div>
+
+    <footer class="w3-red w3-padding-16 w3-center w3-large">
+        Copyright &copy; 2019-2020. &nbsp;CodeandKey
+    </footer>
+
+    <script>
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        var x = ctx;
+
+        var y = document.getElementById('file');
+
+        y.addEventListener('change', function (e) {
+            var url = URL.createObjectURL(e.target.files[0]);
+            document.getElementById("image").src = url;
+        });
+
+        function upl() {
+            var img = document.getElementById("image");
+            ctx.drawImage(img,0,0, c.width, c.height );
+            var dn = document.getElementById("preview");
+            let res = c.toDataURL();
+            dn.src = res;
+        }
+
+        function filter() {
+            let s = document.getElementById('sepia').value;
+            let b = document.getElementById('bright').value;
+            let c = document.getElementById('contrast').value;
+            let h = document.getElementById('hue').value;
+            let sat = document.getElementById('saturation').value;
+            let o = document.getElementById('opac').value;
+            let g = document.getElementById('gray').value;
+            let i = document.getElementById('invert').value;
+            ctx.filter = "sepia(" + s + "%) " + "brightness(" + b + "%)" + " contrast(" + c / 10 + ")" +
+                " hue-rotate(" + h + "deg)" +
+                " saturate(" + sat + ")" + " grayscale(" + g + "%)" + " invert(" + i + "%)" + " blur(" + o + "px)";
+          upl();
+        }
+
+        function show() {
+            document.getElementById("window").style.display = "block";
+            upl();
+            let pre = document.getElementById('preview').src;
+            document.getElementById('downBtn').href=pre;
+        }
+
+        function hide() {
+            document.getElementById("window").style.display = "none";
+        }
+    </script>
+
+</body>
+
+</html>
